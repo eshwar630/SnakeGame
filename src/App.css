@@ -1,4 +1,4 @@
-.cell{
+/* .cell{
     animation: slide 9.5s steps(19) infinite normal;
 }
 @keyframes slide {
@@ -8,4 +8,15 @@
     to{
         transform: translateX(380px);
     }
+} */
+.grid-container{
+    display: grid;
+    grid-template-columns: repeat(20,20px);
+    grid-template-rows: repeat(20,20px);
+}
+.cell{
+    border: 1px solid brown;
+    width: 20px;
+    height: 20px;
+    background-color: blue;
 }
