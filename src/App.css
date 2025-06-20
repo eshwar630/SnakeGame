@@ -1,14 +1,3 @@
-/* .cell{
-    animation: slide 9.5s steps(19) infinite normal;
-}
-@keyframes slide {
-    from{
-        transform: translateX(0px);
-    }
-    to{
-        transform: translateX(380px);
-    }
-} */
 .grid-container{
     display: grid;
     grid-template-columns: repeat(20,20px);
@@ -23,7 +12,7 @@
 .cell{
     width: 20px;
     height: 20px;
-    background-color: rgb(144, 171, 166);
+    background-color: rgb(255, 255, 255);
     box-sizing: border-box;
     border-radius: 5px;
 }
