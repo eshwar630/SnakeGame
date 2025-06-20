@@ -13,10 +13,24 @@
     display: grid;
     grid-template-columns: repeat(20,20px);
     grid-template-rows: repeat(20,20px);
+    height: 440px;
+    width: 440px;
+    padding: 8px;
+    gap: 1px;
+    border: 2px solid brown;
+    place-items: center; 
 }
 .cell{
-    border: 1px solid brown;
+    width: 20px;
+    height: 20px;
+    background-color: rgb(144, 171, 166);
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+.head{
     width: 20px;
     height: 20px;
     background-color: blue;
+    box-sizing: border-box;
+    border-radius: 5px;
 }
