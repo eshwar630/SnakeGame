@@ -1,0 +1,11 @@
+.cell{
+    animation: slide 9.5s steps(19) infinite normal;
+}
+@keyframes slide {
+    from{
+        transform: translateX(0px);
+    }
+    to{
+        transform: translateX(380px);
+    }
+}
