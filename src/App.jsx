@@ -1,56 +1,133 @@
 import './App.css'
 import { useState, useEffect } from 'react'
 function App() {
+  const [food, setfood] = useState(-2);
   const [gameover, setgameover] = useState(false)
   const [score, setscore] = useState(0)
   const grid = Array.from({ length: 400 }, (_, i) => ({ idx: i }));
-  const [direction, setdirection] = useState("r");
-  const [head, sethead] = useState(210)
-  const gamefinished=()=>{
-    setgameover(true)
+  const [direction, setdirection] = useState("");
+  const [head, sethead] = useState(-1)
+  const [arr, setarr] = useState([head])
+  const startGame = () => {
     sethead(210)
+    setarr([210])
+    setdirection("r")
+    setgameover(false)
+    displayFood()
+  }
+  const displayFood = () => {
+    let newFood;
+    do {
+      newFood = Math.floor(Math.random() * 400);
+    } while (arr.some(x=>x===newFood));
+    setfood(newFood);
+  }
+
+  const gamefinished = () => {
+    if (gameover) return;
+    setgameover(true)
+    sethead(-1)
+    setarr([-1])
     setscore(0)
+    setdirection("")
+    setfood(-2)
     alert("The game is over");
   }
   const moveRight = () => {
-    if(gameover){
+    if (gameover) {
       return;
     }
     let c = head % 20;
     if (c < 19) {
+      let len = arr.length - 1;
+      if (head === food) {
+        len++;
+      }
+      let newArr = []
+      newArr.push(head + 1);
+      for (let i = 0; i < len; i++) {
+        if(arr[i]==newArr[0]){
+          gamefinished()
+          return;
+        }
+        newArr.push(arr[i]);
+      }
+      setarr(newArr)
       sethead(head + 1)
     } else {
       gamefinished()
     }
   }
   const moveLeft = () => {
-    if(gameover){
+    if (gameover) {
       return;
     }
     let c = head % 20;
     if (c > 0) {
+      let len = arr.length - 1;
+      if (head === food) {
+        len++;
+      }
+      let newArr = []
+      newArr.push(head - 1);
+      for (let i = 0; i < len; i++) {
+        if(arr[i]==newArr[0]){
+          gamefinished()
+          return;
+        }
+        newArr.push(arr[i]);
+      }
+      setarr(newArr)
       sethead(head - 1)
     } else {
       gamefinished()
     }
   }
   const moveDown = () => {
-    if(gameover){
+    if (gameover) {
       return;
     }
     let r = Math.floor(head / 20);
     if (r < 19) {
+      let len = arr.length - 1;
+      if (head === food) {
+        len++;
+      }
+      let newArr = []
+      newArr.push(head + 20);
+      for (let i = 0; i < len; i++) {
+        if(arr[i]==newArr[0]){
+          gamefinished()
+          return;
+        }
+        newArr.push(arr[i]);
+      }
+      setarr(newArr)
       sethead(head + 20)
     } else {
       gamefinished()
     }
   }
   const moveUp = () => {
-    if(gameover){
+    if (gameover) {
       return;
     }
     let r = Math.floor(head / 20)
     if (r > 0) {
+      let len = arr.length - 1;
+      if (head === food) {
+        len++;
+      }
+      let newArr = []
+      newArr.push(head - 20);
+      for (let i = 0; i < len; i++) {
+        if(arr[i]==newArr[0]){
+          gamefinished()
+          return;
+        }
+        newArr.push(arr[i]);
+      }
+      setarr(newArr)
       sethead(head - 20)
     } else {
       gamefinished()
@@ -58,30 +135,33 @@ function App() {
   }
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if(gameover){
+      if (gameover) {
         return;
       }
-      console.log(e.key)
       switch (e.key) {
         case "ArrowUp":
         case "w":
-          moveUp()
-          setdirection("u")
+          if (direction !== "d") {
+            setdirection("u")
+          }
           break;
         case "ArrowDown":
         case "s":
-          moveDown()
-          setdirection("d")
+          if (direction !== "u") {
+            setdirection("d")
+          }
           break;
         case "ArrowLeft":
         case "a":
-          moveLeft()
-          setdirection("l")
+          if (direction !== "r") {
+            setdirection("l")
+          }
           break;
         case "ArrowRight":
         case "d":
-          moveRight()
-          setdirection("r")
+          if (direction !== "l") {
+            setdirection("r")
+          }
           break;
       }
     };
@@ -91,11 +171,14 @@ function App() {
     };
   }, [head]);
   useEffect(() => {
-    if(gameover){
+    if (gameover || direction === "" ) {
       return;
     }
     const interval = setInterval(() => {
-      setscore(score=>score+1)
+      if (head === food) {
+        setscore(score => score + 1)
+        displayFood()
+      }
       switch (direction) {
         case "u":
           moveUp()
@@ -110,19 +193,21 @@ function App() {
           moveRight()
           break;
       }
-    }, 500);
-
+    }, 200);
     return () => clearInterval(interval)
-  }, [head, direction])
+  }, [direction, arr])
 
   return (
     <>
       <div className='flex justify-center min-h-screen items-center min-w-screen'>
+        <div>
+          <button className='text-[30px] m-30 p-5 border-4' onClick={startGame}>Start</button>
+        </div>
         <div className='grid-container'>
           {grid.map((cell) => (
             <div
               key={cell.idx}
-              className={head === cell.idx ? "head" : "cell"}
+              className={arr.some(x => x === cell.idx) ? "head" : food === cell.idx ? "red" : "cell"}
             ></div>
           ))}
         </div>
