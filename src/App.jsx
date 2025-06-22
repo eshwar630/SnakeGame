@@ -173,7 +173,7 @@ function App() {
             {grid.map((cell) => {
               if (arr[0] === cell.idx) {
                 return (
-                  <div className='thala flex justify-evenly'>
+                  <div className='head flex justify-evenly'>
                     <div className="eyes"></div>
                     <div className="eyes"></div>
                   </div>
@@ -182,7 +182,7 @@ function App() {
                 return (
                   <div
                     key={cell.idx}
-                    className={arr.some(x => x === cell.idx) ? "head" : food === cell.idx ? "red" : "cell"}
+                    className={arr.some(x => x === cell.idx) ? "body" : food === cell.idx ? "red" : "cell"}
                   ></div>
                 )
               }

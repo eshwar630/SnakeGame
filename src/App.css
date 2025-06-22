@@ -16,7 +16,7 @@
     box-sizing: border-box;
     border-radius: 5px;
 }
-.head{
+.body{
     width: 20px;
     height: 20px;
     background-color: blue;
@@ -33,7 +33,7 @@
 .mode:active{
     background-color: rgb(22, 101, 52);
 }
-.thala{
+.head{
     width: 20px;
     height: 20px;
     background-color: blue;
