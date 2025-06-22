@@ -1,9 +1,8 @@
 import './App.css'
-import { useState, useEffect , useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 function App() {
   const gameRef = useRef(true)
   const [food, setfood] = useState(-2);
-  const [gameover, setgameover] = useState(true)
   const [score, setscore] = useState(0)
   const grid = Array.from({ length: 400 }, (_, i) => ({ idx: i }));
   const [direction, setdirection] = useState("");
@@ -13,8 +12,7 @@ function App() {
   const startGame = () => {
     setarr([210])
     setdirection("r")
-    setgameover(false)
-    gameRef.current=false;
+    gameRef.current = false;
     displayFood()
   }
   useEffect(() => {
@@ -31,10 +29,6 @@ function App() {
       sethighScore(0);
     }
   }, [])
-  // useEffect(() => {
-  //   gameRef.current=gameover;
-  // }, [gameover])
-  
   const displayFood = () => {
     if (arr.length === 400) {
       gamefinished();
@@ -49,79 +43,36 @@ function App() {
 
   const gamefinished = () => {
     if (gameRef.current) return;
-    gameRef.current=true;
-    const finalScore=arr[0]===food?score+1:score;
+    gameRef.current = true;
+    const finalScore = arr[0] === food ? score + 1 : score;
     if (score > highScore) {
       sethighScore(finalScore);
       localStorage.setItem('highScore', JSON.stringify(finalScore));
     }
-    setgameover(true)
     setarr([-1])
     setscore(0)
     setdirection("")
     setfood(-2)
     alert("The game is over with a score of " + finalScore);
+    setlevel(400)
   }
-  const moveRight = () => {
-    if (gameRef.current) {
-      return;
-    }
-    let c = arr[0] % 20;
-    if (c < 19) {
-      let len = arr.length - 1;
-      if (arr[0] === food) {
-        len++;
-      }
-      let newArr = []
-      newArr.push(arr[0] + 1);
-      for (let i = 0; i < len; i++) {
-        if (i > 0 && arr[i] == newArr[0]) {
-          gamefinished()
-          return;
-        }
-        newArr.push(arr[i]);
-      }
-      setarr(newArr)
-    } else {
-      gamefinished()
-    }
-  }
-  const moveLeft = () => {
-    if (gameRef.current) {
-      return;
-    }
-    let c = arr[0] % 20;
-    if (c > 0) {
-      let len = arr.length - 1;
-      if (arr[0] === food) {
-        len++;
-      }
-      let newArr = []
-      newArr.push(arr[0] - 1);
-      for (let i = 0; i < len; i++) {
-        if (i > 0 && arr[i] == newArr[0]) {
-          gamefinished()
-          return;
-        }
-        newArr.push(arr[i]);
-      }
-      setarr(newArr)
-    } else {
-      gamefinished()
-    }
-  }
-  const moveDown = () => {
+  const moveSnake = (i, j) => {
     if (gameRef.current) {
       return;
     }
     let r = Math.floor(arr[0] / 20);
-    if (r < 19) {
+    let c = arr[0] % 20;
+    let newRow = r + i;
+    let newCol = c + j;
+    if (newRow < 0 || newRow > 19 || newCol < 0 || newCol > 19) {
+      gamefinished()
+    } else {
       let len = arr.length - 1;
       if (arr[0] === food) {
         len++;
       }
       let newArr = []
-      newArr.push(arr[0] + 20);
+      newArr.push(newRow * 20 + newCol);
       for (let i = 0; i < len; i++) {
         if (i > 0 && arr[i] == newArr[0]) {
           gamefinished()
@@ -130,32 +81,6 @@ function App() {
         newArr.push(arr[i]);
       }
       setarr(newArr)
-    } else {
-      gamefinished()
-    }
-  }
-  const moveUp = () => {
-    if (gameRef.current) {
-      return;
-    }
-    let r = Math.floor(arr[0] / 20)
-    if (r > 0) {
-      let len = arr.length - 1;
-      if (arr[0] === food) {
-        len++;
-      }
-      let newArr = []
-      newArr.push(arr[0] - 20);
-      for (let i = 0; i < len; i++) {
-        if (i > 0 && arr[i] == newArr[0]) {
-          gamefinished()
-          return;
-        }
-        newArr.push(arr[i]);
-      }
-      setarr(newArr)
-    } else {
-      gamefinished()
     }
   }
   useEffect(() => {
@@ -194,7 +119,7 @@ function App() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [gameRef.current,direction]);
+  }, [direction]);
   useEffect(() => {
     if (gameRef.current || direction === "") {
       return;
@@ -206,21 +131,21 @@ function App() {
       }
       switch (direction) {
         case "u":
-          moveUp()
+          moveSnake(-1, 0);
           break;
         case "d":
-          moveDown()
+          moveSnake(1, 0);
           break;
         case "l":
-          moveLeft()
+          moveSnake(0, -1);
           break;
         case "r":
-          moveRight()
+          moveSnake(0, 1);
           break;
       }
     }, level);
     return () => clearInterval(interval)
-  }, [direction, arr[0] , gameRef.current, food, score])
+  }, [direction, arr[0], food, score])
 
   return (
     <>
@@ -228,29 +153,48 @@ function App() {
         <div>
           <p className='flex justify-center text-6xl'>Snake Xensia</p>
         </div>
-        <div className='flex justify-center items-center min-w-screen bg-emerald-300'>
+        <div className='flex justify-center flex-col lg:flex-row items-center min-w-screen bg-emerald-300'>
           <div>
-            <div>
-              <button className='mode text-[15px] m-5 border-4 h-15 w-20 bg-orange-500' disabled={!gameRef.current} onClick={() => { setlevel(600) }}>Easy</button>
+            <div className='flex'>
+              <button className='mode text-[15px] m-5 border-4 h-15 w-20 bg-orange-500' disabled={!gameRef.current} onClick={() => { setlevel(700) }}>Easy</button>
               <button className='mode text-[15px] m-5 border-4 h-15 w-20 bg-orange-500' disabled={!gameRef.current} onClick={() => { setlevel(400) }}>Medium</button>
-              <button className='mode text-[15px] m-5 border-4 h-15 w-20 bg-orange-500' disabled={!gameRef.current} onClick={() => { setlevel(200) }}>Hard</button>
+              <button className='mode text-[15px] m-5 border-4 h-15 w-20 bg-orange-500' disabled={!gameRef.current} onClick={() => { setlevel(100) }}>Hard</button>
             </div>
-            <button className='text-[25px] m-25 p-5 border-4 bg-orange-500 active:bg-green-800' onClick={startGame}>Start</button>
+            <div className='flex justify-around'>
+              <div className='flex justify-center'>
+                <button className='text-[25px] p-5 border-4 bg-orange-500 active:bg-green-800' onClick={startGame}>Start</button>
+              </div>
+              <div className='flex justify-center'>
+                <button className='text-[25px] p-5 border-4 bg-orange-500 active:bg-green-800' onClick={gamefinished}>Stop</button>
+              </div>
+            </div>
           </div>
           <div className='grid-container'>
-            {grid.map((cell) => (
-              <div
-                key={cell.idx}
-                className={arr.some(x => x === cell.idx) ? "head" : food === cell.idx ? "red" : "cell"}
-              ></div>
-            ))}
+            {grid.map((cell) => {
+              if (arr[0] === cell.idx) {
+                return (
+                  <div className='thala flex justify-evenly'>
+                    <div className="eyes"></div>
+                    <div className="eyes"></div>
+                  </div>
+                )
+              } else {
+                return (
+                  <div
+                    key={cell.idx}
+                    className={arr.some(x => x === cell.idx) ? "head" : food === cell.idx ? "red" : "cell"}
+                  ></div>
+                )
+              }
+            }
+            )}
           </div>
           <div>
             <div>
               <p className='text-[25px] m-25 p-5 border-4 bg-orange-500'>HighScore: {highScore}</p>
             </div>
             <div>
-              <p className='text-[25px] m-25 p-5 border-4 bg-orange-500'>Score: {score}</p>
+              <p className='text-[25px] m-25 p-5 border-4 bg-orange-500'>Current Score: {score}</p>
             </div>
           </div>
         </div>

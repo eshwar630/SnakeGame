@@ -33,3 +33,18 @@
 .mode:active{
     background-color: rgb(22, 101, 52);
 }
+.thala{
+    width: 20px;
+    height: 20px;
+    background-color: blue;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+.eyes{
+    margin-top: 3px;
+    width: 5px;
+    height: 5px;
+    background-color: black;
+    box-sizing: border-box;
+    border-radius: 50%;
+}
