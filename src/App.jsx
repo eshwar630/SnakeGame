@@ -10,6 +10,7 @@ function App() {
   const [level, setlevel] = useState(400);
   const [highScore, sethighScore] = useState(0)
   const startGame = () => {
+    playStartSound();
     setarr([210])
     setdirection("r")
     gameRef.current = false;
@@ -28,6 +29,9 @@ function App() {
     } catch (err) {
       sethighScore(0);
     }
+    startsound.current.load();
+    bonussound.current.load();
+    stopsound.current.load();
   }, [])
   const displayFood = () => {
     if (arr.length === 400) {
@@ -40,9 +44,9 @@ function App() {
     } while (arr.some(x => x === newFood));
     setfood(newFood);
   }
-
   const gamefinished = () => {
     if (gameRef.current) return;
+    playStopSound();
     gameRef.current = true;
     const finalScore = arr[0] === food ? score + 1 : score;
     if (score > highScore) {
@@ -126,8 +130,12 @@ function App() {
     }
     const interval = setInterval(() => {
       if (arr[0] === food) {
+        playBonusSound();
         setscore(score => score + 1)
-        displayFood()
+        if(score%5==0){
+          setlevel(Math.floor((level*95)/100))
+        }
+        displayFood();
       }
       switch (direction) {
         case "u":
@@ -146,7 +154,21 @@ function App() {
     }, level);
     return () => clearInterval(interval)
   }, [direction, arr[0], food, score])
-
+  const startsound = useRef(new Audio("/SnakeGame/startGame.mp3"));
+  const bonussound = useRef(new Audio("/SnakeGame/bonus.mp3"));
+  const stopsound = useRef(new Audio("/SnakeGame/stopGame.mp3"));
+  const playStartSound = () => {
+    startsound.current.currentTime = 0;
+    startsound.current.play();
+  };
+  const playBonusSound = () => {
+    bonussound.current.currentTime = 0;
+    bonussound.current.play();
+  };
+  const playStopSound = () => {
+    stopsound.current.currentTime = 0;
+    stopsound.current.play();
+  };
   return (
     <>
       <div className='bg-emerald-300 min-h-screen'>
@@ -199,7 +221,6 @@ function App() {
           </div>
         </div>
       </div>
-
     </>
   )
 }
